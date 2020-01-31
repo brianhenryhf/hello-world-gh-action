@@ -12,7 +12,10 @@ try {
   const trelloKey = core.getInput('trello-key');
   const trelloToken = core.getInput('trello-token');
 
-  console.log(`TRELLO_KEY from workflow repo: ${trelloKey}`)
+  console.log(`TRELLO_KEY from workflow repo: ${trelloKey}`);
+  
+  //TOOD check if attachment already present?  if we allow this to run on edit, or even if just run and somebody already added on trello side, be graceful.
+  // yeah, check https://api.trello.com/1/cards/CIqx54dG/attachments and if not empty it'll be an array of obj with 'name' of a github url
   
   //find 1st instance of trello card url - must be 1st thing in PR
   const matches = reggie.exec(body);
