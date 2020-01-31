@@ -2,14 +2,15 @@ const core = require('@actions/core');
 const github = require('@actions/github');
 
 try {
-  //TOOD chcek if failure will stop the PR from being mergeable?
+  //TOOD chcek if failure will stop the PR from being mergeable?  well it does mark the build failed.  if we have checks on that it could be a problem.
   
   
   console.log(`pr body: ${github.context.payload.pull_request.body}`);
   const body = github.context.payload.pull_request.body;
 
   //find 1st instance of trello card url - must be 1st thing in PR
-  console.log(`card id = ${/^\s*https\:\/\/trello\.com\/c\/([^\/#?]+)/.exec(body)[1]}`);
+  const matches = r.exec(body);
+  console.log(`card id = ${matches && matches[1]}`);
 
   
   console.log('');
