@@ -2,7 +2,7 @@ const core = require('@actions/core');
 const github = require('@actions/github');
 const axios = require('axios');
 
-const extractTrelloCardId(prBody) {
+const extractTrelloCardId = (prBody) => {
   console.log(`pr body: ${prBody}`);  
   
   //find 1st instance of trello card url - must be 1st thing in PR
