@@ -2,10 +2,10 @@ const core = require('@actions/core');
 const github = require('@actions/github');
 
 try {
-  console.dir(`#{github.context}`);
+  console.dir(github.context);
   console.log('');
   
-  console.log(`pr body: #{github.context.payload.pull_request.body}`);
+  console.log(`pr body: ${github.context.payload.pull_request.body}`);
   
   console.log('');
   
