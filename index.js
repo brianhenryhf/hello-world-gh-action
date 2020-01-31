@@ -2,6 +2,15 @@ const core = require('@actions/core');
 const github = require('@actions/github');
 
 try {
+  console.dir(`#{github.context}`);
+  console.log('');
+  
+  console.log(`pr body: #{github.context.payload.pull_request.body}`);
+  
+  console.log('');
+  
+  
+  
   // `who-to-greet` input defined in action metadata file
   const nameToGreet = core.getInput('who-to-greet');
   console.log(`Hello ${nameToGreet}!`);
