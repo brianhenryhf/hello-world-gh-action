@@ -10,26 +10,36 @@ const trelloClient = axios.create({
 });
 
 const requestTrello = async (verb, url, body = null) => {
-  return trelloClient.request({
-      method: verb,
-      url: url,
-      data: body || {}, 
-      params: {
-          key: trelloKey, 
-          token: trelloToken
-      }
-  })
-  .then((res) => {
-    console.log(`status: ${res.status}.  data follows:`);
-    console.dir(res.data)
+  try {
+    const res = trelloClient.request({
+        method: verb,
+        url: url,
+        data: body || {}, 
+        params: {
+            key: trelloKey, 
+            token: trelloToken
+        }
+    });  
+    console.log(`${verb} to ${url} completed with status: ${res.status}.  data follows:`);
+    console.dir(res.data);
     return res.data;
-  })        
+  } catch(err) {
+    console.log(`${verb} to ${url} errored: ${err}`);
+    if(err.response) {
+      //console.log(`status: ${err.status}.  error data follows:`);
+      console.dir(err.response.data);
+    }
+    throw err;  
+  }
 };
 
 const getCardAttachments = async (cardId) => {
   return requestTrello('get', `/1/cards/${cardId}/attachments`);
 };
 
+const createCardAttachment = async (cardId, attachUrl) => {
+  return requestTrello('post', `/1/cards/${cardId}/attachments`, {url: attachUrl});
+};
 
 const extractTrelloCardId = (prBody) =>   {
   console.log(`pr body: ${prBody}`);  
@@ -46,28 +56,20 @@ const extractTrelloCardId = (prBody) =>   {
 (async () => {
   try {
     const cardId = extractTrelloCardId(github.context.payload.pull_request.body);
+    const prUrl = github.context.payload.pull_request.url;
   
     //TOOD check if attachment already present?  if we allow this to run on edit, or even if just run and somebody already added on trello side, be graceful.
     // yeah, check https://api.trello.com/1/cards/CIqx54dG/attachments and if not empty it'll be an array of obj with 'name' of a github url
   
     if(cardId) {
+      let extantAttachments;
+      
+      extantAttachments = await getCardAttachments(cardId);
 
-      try {
-        const attachments = await getCardAttachments(cardId);
-      } catch(err) {
-        console.log(`error fetching attachments: ${err}`);
-        if(err.response) {
-          //console.log(`status: ${err.status}.  error data follows:`);
-          console.dir(err.response.data);
-        }
-        throw 'error fetching trello attachments';
+      //make sure not already attached
+      if(extantAttachments == null || !extantAttachments.some(it => it.url === prUrl)) {
+        createCardAttachment(cardId, attachUrl);
       }
-
-
-
-
-  
-
     }
 
   
