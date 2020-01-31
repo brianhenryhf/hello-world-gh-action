@@ -20,6 +20,8 @@ try {
   
   // TODO add badge if it works?
   
+  //TODO this should prolly respond to PR body edits too, if that's possible
+  
   
   // `who-to-greet` input defined in action metadata file
   const nameToGreet = core.getInput('who-to-greet');
