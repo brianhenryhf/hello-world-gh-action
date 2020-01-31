@@ -4,7 +4,7 @@ const github = require('@actions/github');
 try {
   //TOOD chcek if failure will stop the PR from being mergeable?  well it does mark the build failed.  if we have checks on that it could be a problem.
 
-  const reggie = /^\s*https\:\/\/trello\.com\/c\/([^\/#?]+)/;
+  const reggie = /^\s*https\:\/\/trello\.com\/c\/(\w+)/;
   
   console.log(`pr body: ${github.context.payload.pull_request.body}`);
   const body = github.context.payload.pull_request.body;
