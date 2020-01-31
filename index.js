@@ -8,12 +8,17 @@ try {
   
   console.log(`pr body: ${github.context.payload.pull_request.body}`);
   const body = github.context.payload.pull_request.body;
-  
+
+  const trelloKey = core.getInput('trello-key');
+  const trelloToken = core.getInput('trello-token');
+
+  console.log(`TRELLO_KEY from workflow repo: ${trelloKey}`)
   
   //find 1st instance of trello card url - must be 1st thing in PR
   const matches = reggie.exec(body);
   console.log(`card id = ${matches && matches[1]}`);
 
+  
   
   console.log('');
   
