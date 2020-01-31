@@ -10,9 +10,9 @@ const trelloClient = axios.create({
 });
 
 const requestTrello = async (verb, url, body = null) => {
-  return trelloClient.request(
+  return trelloClient.request({
       method: verb,
-      url: url, {
+      url: url,
       data: body || {}, 
       params: {
           key: trelloKey, 
