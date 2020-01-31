@@ -2,9 +2,34 @@ const core = require('@actions/core');
 const github = require('@actions/github');
 const axios = require('axios');
 
+const trelloKey = core.getInput('trello-key');
+const trelloToken = core.getInput('trello-token');
+
 const trelloClient = axios.create({
   baseURL: 'https://api.trello.com',
-});  
+});
+
+const requestTrello = async (verb, url, body = null) => {
+  return trelloClient.request(
+      method: verb,
+      url: url, {
+      data: body || {}, 
+      params: {
+          key: trelloKey, 
+          token: trelloToken
+      }
+  })
+  .then((res) => {
+    console.log(`status: ${res.status}.  data follows:`);
+    console.dir(res.data)
+    return res.data;
+  })        
+};
+
+const getCardAttachments = async (cardId) => {
+  return requestTrello('get', `/1/cards/${cardId}/attachments`);
+};
+
 
 const extractTrelloCardId = (prBody) =>   {
   console.log(`pr body: ${prBody}`);  
@@ -17,28 +42,9 @@ const extractTrelloCardId = (prBody) =>   {
   return cardId;
 }
 
-const getCardAttachments = async (cardId) => {
-  return trelloClient.get(`/1/cards/${cardId}/attachments`, {
-      data: {}, 
-      params: {
-          key: trelloKey, 
-          token: trelloToken
-      }
-  }).then((res) => {
-    console.log(`status: ${res.status}.  data follows:`);
-    console.dir(res.data)
-    return res.data;
-  })
-};
-
 
 (async () => {
   try {
-    //TOOD chcek if failure will stop the PR from being mergeable?  A: well it does mark the build failed.  if we have checks on that it could be a problem.
-
-    const trelloKey = core.getInput('trello-key');
-    const trelloToken = core.getInput('trello-token');
-
     const cardId = extractTrelloCardId(github.context.payload.pull_request.body);
   
     //TOOD check if attachment already present?  if we allow this to run on edit, or even if just run and somebody already added on trello side, be graceful.
@@ -81,6 +87,7 @@ const getCardAttachments = async (cardId) => {
     //core.setOutput("time", time);
 
   } catch (error) {
+    //failure will stop PR from being mergeable if we have that setting on the repo.  there is not currently a neutral exit in actions v2.
     core.setFailed(error.message);
   }
 })();
