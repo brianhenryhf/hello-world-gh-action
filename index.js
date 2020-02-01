@@ -57,7 +57,7 @@ const extractTrelloCardId = (prBody) =>   {
 (async () => {
   try {
     const cardId = extractTrelloCardId(github.context.payload.pull_request.body);
-    const prUrl = github.context.payload.pull_request.url;
+    const prUrl = github.context.payload.pull_request.html_url;
   
     //TOOD check if attachment already present?  if we allow this to run on edit, or even if just run and somebody already added on trello side, be graceful.
     // yeah, check https://api.trello.com/1/cards/CIqx54dG/attachments and if not empty it'll be an array of obj with 'name' of a github url
