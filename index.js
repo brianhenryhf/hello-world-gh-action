@@ -62,7 +62,7 @@ const extractTrelloCardId = (prBody) =>   {
     if(cardId) {
       let extantAttachments;
       
-      console.log(`card ${cardId} requested in pr comment.`);
+      console.log(`card url for ${cardId} specified in pr comment.`);
       extantAttachments = await getCardAttachments(cardId);
 
       //make sure not already attached
@@ -73,7 +73,7 @@ const extractTrelloCardId = (prBody) =>   {
         console.log('trello attachement already exists. skipped create.');
       }
     } else {
-      console.log(`no card in pr comment. nothing to do`);
+      console.log(`no card url in pr comment. nothing to do`);
     }
   
     //if we wanted to make chainable.  move card to a new column in a subsequent action, for example?
