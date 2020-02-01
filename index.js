@@ -2,6 +2,7 @@ const core = require('@actions/core');
 const github = require('@actions/github');
 const axios = require('axios');
 
+//configured in workflow file, which in turn should use repo secrets settings
 const trelloKey = core.getInput('trello-key');
 const trelloToken = core.getInput('trello-token');
 
@@ -68,7 +69,7 @@ const extractTrelloCardId = (prBody) =>   {
 
       //make sure not already attached
       if(extantAttachments == null || !extantAttachments.some(it => it.url === prUrl)) {
-        createCardAttachment(cardId, attachUrl);
+        createCardAttachment(cardId, prUrl);
       }
     }
 
@@ -84,8 +85,6 @@ const extractTrelloCardId = (prBody) =>   {
     //TODO this should prolly respond to PR body edits too, if that's possible
   
   
-    // `who-to-greet` input defined in action metadata file
-
     //core.setOutput("time", time);
 
   } catch (error) {
