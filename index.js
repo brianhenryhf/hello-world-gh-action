@@ -79,8 +79,8 @@ const extractTrelloCardId = (prBody) =>   {
       console.log(`no card in pr comment. nothing to do`);
     }
   
-core.setOutput("thing", 1234);
-
+    //if we wanted to make chainable.  move card to a new column in a subsequent action, for example?
+    //core.setOutput("trelloCardId", cardId);
   } catch (error) {
     //failure will stop PR from being mergeable if we have that setting on the repo.  there is not currently a neutral exit in actions v2.
     core.setFailed(error.message);
