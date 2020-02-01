@@ -12,7 +12,7 @@ const trelloClient = axios.create({
 
 const requestTrello = async (verb, url, body = null) => {
   try {
-    const res = trelloClient.request({
+    const res = await trelloClient.request({
         method: verb,
         url: url,
         data: body || {}, 
@@ -65,27 +65,21 @@ const extractTrelloCardId = (prBody) =>   {
     if(cardId) {
       let extantAttachments;
       
+      console.log(`card ${cardId} requested in pr comment.`);
       extantAttachments = await getCardAttachments(cardId);
 
       //make sure not already attached
       if(extantAttachments == null || !extantAttachments.some(it => it.url === prUrl)) {
-        createCardAttachment(cardId, prUrl);
+        const createdAttachment = await createCardAttachment(cardId, prUrl);
+        console.log(`created trello attachment: ${JSON.stringify(createdAttachment)}`);
+      } else {
+        console.log('trello attachement already exists. skipped create.');
       }
+    } else {
+      console.log(`no card in pr comment. nothing to do`);
     }
-
   
-    //console.log('');
-    // const payload = JSON.stringify(github.context.payload, undefined, 2)
-    // console.log(`The event payload: ${payload}`);
-
-    //console.log('');
-  
-    // TODO add badge if it works?
-  
-    //TODO this should prolly respond to PR body edits too, if that's possible
-  
-  
-    //core.setOutput("time", time);
+core.setOutput("thing", 1234);
 
   } catch (error) {
     //failure will stop PR from being mergeable if we have that setting on the repo.  there is not currently a neutral exit in actions v2.
