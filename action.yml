@@ -1,13 +1,12 @@
-name: 'Hello World'
-description: 'Greet someone and record the time'
+name: 'Attach to Trello Card'
+description: 'Add attachment to a given Trello card URL, to Attach Pull Request'
 inputs:
-  who-to-greet:  # id of input
-    description: 'Who to greet'
+  trello-key:
+    description: '(public) Trello auth key for account'
     required: true
-    default: 'World'
-outputs:
-  time: # id of output
-    description: 'The time we we greeted you'
+  trello-token:
+    description: 'secret Trello auth token for account'
+    required: true
 runs:
   using: 'node12'
   main: 'index.js'

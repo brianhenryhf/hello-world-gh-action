@@ -1,22 +1,22 @@
 {
-  "name": "hello-world-javascript-action",
+  "name": "Attach to Trello Card",
   "version": "1.0.0",
-  "description": "This action prints \"Hello World\" or \"Hello\" + the name of a person to greet to the log.",
+  "description": "Github Action: Add attachment to a given Trello card URL, to Attach Pull Request",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "lint": " ./node_modules/eslint/bin/eslint.js . --ext .json --ext .js"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/actions/hello-world-javascript-action.git"
+    "url": "   XX   git+https://github.com/actions/hello-world-javascript-action.git  XX  "
   },
   "keywords": [],
-  "author": "",
+  "author": "Brian Henry",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/actions/hello-world-javascript-action/issues"
+    "url": "  BRH TODO   "
   },
-  "homepage": "https://github.com/actions/hello-world-javascript-action#readme",
+  "homepage": "  BRH TODO   ",
   "dependencies": {
     "@actions/core": "^1.1.0",
     "@actions/github": "^1.1.0",
