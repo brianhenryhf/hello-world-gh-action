@@ -5,21 +5,31 @@ const axios = require('axios');
 //configured in workflow file, which in turn should use repo secrets settings
 const trelloKey = core.getInput('trello-key');
 const trelloToken = core.getInput('trello-token');
+//adds extra (redundant) PR comment, to mimic normal behavior of trello GH powerup
+const shouldAddPrComment = core.getInput('add-pr-comment');
+
+//TODO are inputs ever non-string type?
+console.log(`input type bool? ${shouldAddPrComment == true || shouldAddPrComment == false}`);
+
+
 
 const trelloClient = axios.create({
   baseURL: 'https://api.trello.com',
 });
 
-const requestTrello = async (verb, url, body = null) => {
+const requestTrello = async (verb, url, body = null, extraParams = null) => {
   try {
+    const params = {
+        ...(extraParams || {}),
+        key: trelloKey, 
+        token: trelloToken    
+    };
+    
     const res = await trelloClient.request({
         method: verb,
         url: url,
         data: body || {}, 
-        params: {
-            key: trelloKey, 
-            token: trelloToken
-        }
+        params: params
     });  
     console.log(`${verb} to ${url} completed with status: ${res.status}.  data follows:`);
     console.dir(res.data);
@@ -42,6 +52,10 @@ const createCardAttachment = async (cardId, attachUrl) => {
   return requestTrello('post', `/1/cards/${cardId}/attachments`, {url: attachUrl});
 };
 
+const getCardInfoSubset = async (cardId) => {
+  return requestTrello('post', `/1/cards/${cardId}`, null, {fields: 'name,url'});
+};
+
 const extractTrelloCardId = (prBody) =>   {
   console.log(`pr body: ${prBody}`);  
   
@@ -53,6 +67,42 @@ const extractTrelloCardId = (prBody) =>   {
   return cardId;
 }
 
+
+const getPrComments = async () => {
+  const octokit = new github.GitHub(github.context.token);
+  const evthookPayload = github.context.payload;
+  
+  return octokit.issues.listComments({
+      owner: (evthookPayload.organization || evthookPayload.owner).login,
+      repo: evthookPayload.repository.name,
+      issue_number: evthookPayload.pull_request.number
+  });
+};
+
+const addPrComment = async (body) => {
+  const octokit = new github.GitHub(github.context.token);
+  
+  return await octokit.issues.createComment({
+      owner: (evthookPayload.organization || evthookPayload.owner).login,
+      repo: evthookPayload.repository.name,
+      issue_number: evthookPayload.pull_request.number,
+      body
+  });
+}; 
+
+const commentsContainsTrelloLink = async (cardId) => {
+  const comments = await getPrComments();
+  const linkRegex = new RegExp(`\[[^\]]+\]\(https:\/\/trello.com\/c\/${cardId}\/[^)]+\)`);
+  
+  return comments.data.some((comment) => linkRegex.test(comment.body));
+};
+
+const buildTrelloLinkComment = async (cardId) => {
+  const template = '![](https://github.trello.services/images/mini-trello-icon.png) [%s](%s)';
+  
+  const cardInfo = await getCardInfoSubset();
+  return util.format(template, cardInfo.name, cardInfo.url);
+}
 
 (async () => {
   try {
@@ -69,6 +119,14 @@ const extractTrelloCardId = (prBody) =>   {
       if(extantAttachments == null || !extantAttachments.some(it => it.url === prUrl)) {
         const createdAttachment = await createCardAttachment(cardId, prUrl);
         console.log(`created trello attachment: ${JSON.stringify(createdAttachment)}`);
+        
+        if(shouldAddPrComment && !await commentsContainsTrelloLink(cardId)) {
+          console.log('adding pr comment');
+          const newComment = await buildTrelloLinkComment(cardId)
+          addPrComment(newComment);
+        } else {
+          console.log('pr comment present or unwanted - skipping add');
+        }
       } else {
         console.log('trello attachement already exists. skipped create.');
       }
