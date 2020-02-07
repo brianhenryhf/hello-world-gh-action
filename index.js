@@ -10,6 +10,7 @@ const shouldAddPrComment = core.getInput('add-pr-comment');
 
 //TODO are inputs ever non-string type?
 console.log(`input type bool? ${shouldAddPrComment == true || shouldAddPrComment == false}`);
+console.log(`input null? ${shouldAddPrComment === null}`);
 
 
 
