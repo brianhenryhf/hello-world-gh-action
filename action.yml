@@ -7,6 +7,10 @@ inputs:
   trello-token:
     description: 'secret Trello auth token for account'
     required: true
+  add-pr-comment:
+    description: 'should behave like Trello power-up and add (redundant) comment'
+    required: false
+    default: false
 runs:
   using: 'node12'
   main: 'index.js'
