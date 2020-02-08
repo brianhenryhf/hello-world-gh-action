@@ -128,7 +128,7 @@ const buildTrelloLinkComment = async (cardId) => {
         if(shouldAddPrComment && !await commentsContainsTrelloLink(cardId)) {
           console.log('adding pr comment');
           const newComment = await buildTrelloLinkComment(cardId)
-          addPrComment(newComment);
+//          addPrComment(newComment);
 
 
           console.log('added comment');
