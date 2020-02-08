@@ -68,7 +68,10 @@ const getPrComments = async () => {
   const octokit = new github.GitHub(github.context.token);
   const evthookPayload = github.context.payload;
   
-  return octokit.issues.listComments({
+  console.dir(evthookPayload);
+  
+  
+  return await octokit.issues.listComments({
       owner: (evthookPayload.organization || evthookPayload.owner).login,
       repo: evthookPayload.repository.name,
       issue_number: evthookPayload.pull_request.number
