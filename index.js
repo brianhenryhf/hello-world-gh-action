@@ -74,7 +74,7 @@ const getPrComments = async () => {
   
   
   return await octokit.issues.listComments({
-      owner: (evthookPayload.organization || evthookPayload.owner).login,
+      owner: (evthookPayload.organization || evthookPayload.repository.owner).login,
       repo: evthookPayload.repository.name,
       issue_number: evthookPayload.pull_request.number
   });
