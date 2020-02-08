@@ -66,15 +66,19 @@ const baseIssuesArgs = {
 };
 
 const getPrComments = async () => {
-  return await octokit.issues.listComments(baseIssuesArgs);
+  return octokit.issues.listComments(baseIssuesArgs);
 };
 
 const addPrComment = async (body) => {
-  return await octokit.issues.createComment({
+  return octokit.issues.createComment({
       ...baseIssuesArgs,
       body
   });
 };
+console.log('addPrComment should be defined');
+
+
+
 
 
 
@@ -124,6 +128,8 @@ const buildTrelloLinkComment = async (cardId) => {
           console.log('adding pr comment');
           const newComment = await buildTrelloLinkComment(cardId)
 
+          
+          console.log('about to add comment for reals')
           //comments as 'github actions' bot, at least when using token automatically generated for GH workflows
           await addPrComment(newComment);
         } else {
