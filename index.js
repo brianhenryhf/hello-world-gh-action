@@ -94,6 +94,9 @@ const addPrComment = async (body) => {
 
 const commentsContainsTrelloLink = async (cardId) => {
   const comments = await getPrComments();
+
+  console.log('got comments');
+  
   const linkRegex = new RegExp(`\[[^\]]+\]\(https:\/\/trello.com\/c\/${cardId}\/[^)]+\)`);
   
   return comments.data.some((comment) => linkRegex.test(comment.body));
@@ -126,6 +129,10 @@ const buildTrelloLinkComment = async (cardId) => {
           console.log('adding pr comment');
           const newComment = await buildTrelloLinkComment(cardId)
           addPrComment(newComment);
+
+
+          console.log('added comment');
+
         } else {
           console.log('pr comment present or unwanted - skipping add');
         }
