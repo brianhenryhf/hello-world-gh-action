@@ -6,12 +6,7 @@ const axios = require('axios');
 const trelloKey = core.getInput('trello-key');
 const trelloToken = core.getInput('trello-token');
 //adds extra (redundant) PR comment, to mimic normal behavior of trello GH powerup
-const shouldAddPrComment = core.getInput('add-pr-comment');
-
-//TODO are inputs ever non-string type?
-console.log(`input type bool? ${shouldAddPrComment == true || shouldAddPrComment == false}`);
-console.log(`input null? ${shouldAddPrComment === null}`);
-
+const shouldAddPrComment = core.getInput('add-pr-comment') === 'true';
 
 
 const trelloClient = axios.create({
