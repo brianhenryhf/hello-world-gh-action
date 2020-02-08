@@ -9,6 +9,25 @@ const trelloToken = core.getInput('trello-token');
 const shouldAddPrComment = core.getInput('add-pr-comment') === 'true';
 const ghToken = core.getInput('repo-token');
 
+
+
+/*
+TODOS
+- oh, duh- make sure this doesn't write the comment > 1 time.  remove attachment b/w tries to make sure logic runs.
+- update my fork to use correct evthookPayload.organization || evthookPayload.repository.owner).login logic!
+- cleanup log statements below and commit
+
+- update my repo for this action (make sure to change FT workflow to have addtional inputs)
+- CONSIDER: taking optional parts out as extra action in same workflow.  could pass on cardid.  but we'd have duplicate logic with the trello api stuff, no?  that is annoying.
+(update readme for this to indicate it expects to be called for PR events - payload is specific.  maybe that's obvious.)
+
+? refactor git calls into a single obj with reused stuff?  or at least pull out common stuff like the trello part.
+
+
+*/
+
+
+
 const trelloClient = axios.create({
   baseURL: 'https://api.trello.com',
 });
@@ -69,11 +88,6 @@ const getPrComments = async () => {
   const octokit = new github.GitHub(ghToken);
   const evthookPayload = github.context.payload;
   
-  
-
-  //console.dir(github.context);
-  
-  
   return await octokit.issues.listComments({
       owner: (evthookPayload.organization || evthookPayload.repository.owner).login,
       repo: evthookPayload.repository.name,
@@ -97,6 +111,7 @@ const commentsContainsTrelloLink = async (cardId) => {
   const comments = await getPrComments();
 
   console.log('got comments');
+  console.dir(comments);
   
   const linkRegex = new RegExp(`\[[^\]]+\]\(https:\/\/trello.com\/c\/${cardId}\/[^)]+\)`);
   
@@ -105,7 +120,7 @@ const commentsContainsTrelloLink = async (cardId) => {
 
 const buildTrelloLinkComment = async (cardId) => {
   const cardInfo = await getCardInfoSubset(cardId);
-  return `![](https://github.trello.services/images/mini-trello-icon.png) [${cardInfo.name}](${cardInfo.url})'`;
+  return `![](https://github.trello.services/images/mini-trello-icon.png) [${cardInfo.name}](${cardInfo.url})`;
 }
 
 
@@ -128,11 +143,11 @@ const buildTrelloLinkComment = async (cardId) => {
         if(shouldAddPrComment && !await commentsContainsTrelloLink(cardId)) {
           console.log('adding pr comment');
           const newComment = await buildTrelloLinkComment(cardId)
+
+          //comments as 'github actions' bot
           addPrComment(newComment);
 
-
           console.log('added comment');
-
         } else {
           console.log('pr comment present or unwanted - skipping add');
         }
