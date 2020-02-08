@@ -70,7 +70,7 @@ const getPrComments = async () => {
   
   
   
-  console.dir(evthookPayload);
+  console.dir(github.context);
   
   
   return await octokit.issues.listComments({
@@ -85,7 +85,7 @@ const addPrComment = async (body) => {
   const evthookPayload = github.context.payload;
   
   return await octokit.issues.createComment({
-      owner: (evthookPayload.organization || evthookPayload.owner).login,
+      owner: (evthookPayload.organization || evthookPayload.repository.owner).login,
       repo: evthookPayload.repository.name,
       issue_number: evthookPayload.pull_request.number,
       body
