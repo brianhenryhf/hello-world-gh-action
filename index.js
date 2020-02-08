@@ -70,7 +70,7 @@ const getPrComments = async () => {
 };
 
 const addPrComment = async (body) => {
-  return await octokit.issues.listComments({
+  return await octokit.issues.createComment({
       ...baseIssuesArgs,
       body
   });
