@@ -7,26 +7,10 @@ const trelloKey = core.getInput('trello-key');
 const trelloToken = core.getInput('trello-token');
 //adds extra (redundant) PR comment, to mimic normal behavior of trello GH powerup
 const shouldAddPrComment = core.getInput('add-pr-comment') === 'true';
+//token is NOT magically present in context as some docs seem to indicate - have to supply in workflow yaml to input var
 const ghToken = core.getInput('repo-token');
 
-
-
-/*
-TODOS
-- oh, duh- make sure this doesn't write the comment > 1 time.  remove attachment b/w tries to make sure logic runs.
-- update my fork to use correct evthookPayload.organization || evthookPayload.repository.owner).login logic!
-- cleanup log statements below and commit
-
-- update my repo for this action (make sure to change FT workflow to have addtional inputs)
-- CONSIDER: taking optional parts out as extra action in same workflow.  could pass on cardid.  but we'd have duplicate logic with the trello api stuff, no?  that is annoying.
-(update readme for this to indicate it expects to be called for PR events - payload is specific.  maybe that's obvious.)
-
-? refactor git calls into a single obj with reused stuff?  or at least pull out common stuff like the trello part.
-
-
-*/
-
-
+const evthookPayload = github.context.payload;
 
 const trelloClient = axios.create({
   baseURL: 'https://api.trello.com',
@@ -71,6 +55,29 @@ const getCardInfoSubset = async (cardId) => {
   return requestTrello('get', `/1/cards/${cardId}`, null, {fields: 'name,url'});
 };
 
+
+
+const octokit = new github.GitHub(ghToken);
+
+const baseIssuesArgs = {
+    owner: (evthookPayload.organization || evthookPayload.repository.owner).login,
+    repo: evthookPayload.repository.name,
+    issue_number: evthookPayload.pull_request.number
+};
+
+const getPrComments = async () => {
+  return await octokit.issues.listComments(baseIssuesArgs);
+};
+
+const addPrComments = async (body) => {
+  return await octokit.issues.listComments({
+      ...baseIssuesArgs,
+      body
+  });
+};
+
+
+
 const extractTrelloCardId = (prBody) =>   {
   console.log(`pr body: ${prBody}`);  
   
@@ -82,41 +89,10 @@ const extractTrelloCardId = (prBody) =>   {
   return cardId;
 }
 
-
-const getPrComments = async () => {
-  //token is not magically present in context
-  const octokit = new github.GitHub(ghToken);
-  const evthookPayload = github.context.payload;
-  
-  return await octokit.issues.listComments({
-      owner: (evthookPayload.organization || evthookPayload.repository.owner).login,
-      repo: evthookPayload.repository.name,
-      issue_number: evthookPayload.pull_request.number
-  });
-};
-
-const addPrComment = async (body) => {
-  const octokit = new github.GitHub(ghToken);
-  const evthookPayload = github.context.payload;
-  
-  return await octokit.issues.createComment({
-      owner: (evthookPayload.organization || evthookPayload.repository.owner).login,
-      repo: evthookPayload.repository.name,
-      issue_number: evthookPayload.pull_request.number,
-      body
-  });
-}; 
-
 const commentsContainsTrelloLink = async (cardId) => {
-  const comments = await getPrComments();
-
-  console.log('got comments');
-  console.dir(comments);
-  
   const linkRegex = new RegExp(`\\[[^\\]]+\\]\\(https:\\/\\/trello.com\\/c\\/${cardId}\\/[^)]+\\)`);
-  
-  console.log(`looking for ${linkRegex}`);
-  
+
+  const comments = await getPrComments();  
   return comments.data.some((comment) => linkRegex.test(comment.body));
 };
 
@@ -126,13 +102,11 @@ const buildTrelloLinkComment = async (cardId) => {
 }
 
 
+
 (async () => {
   try {
-    
-    console.dir(github.context.payload.issue.number);
-  
-    const cardId = extractTrelloCardId(github.context.payload.pull_request.body);
-    const prUrl = github.context.payload.pull_request.html_url;
+    const cardId = extractTrelloCardId(evthookPayload.pull_request.body);
+    const prUrl = evthookPayload.pull_request.html_url;
   
     if(cardId) {
       let extantAttachments;
@@ -145,14 +119,13 @@ const buildTrelloLinkComment = async (cardId) => {
         const createdAttachment = await createCardAttachment(cardId, prUrl);
         console.log(`created trello attachment: ${JSON.stringify(createdAttachment)}`);
         
+        // BRH NOTE actually, the power-up doesn't check if it previously added comment, so check is maybe superfluous
         if(shouldAddPrComment && !await commentsContainsTrelloLink(cardId)) {
           console.log('adding pr comment');
           const newComment = await buildTrelloLinkComment(cardId)
 
-          //comments as 'github actions' bot
+          //comments as 'github actions' bot, at least when using token automatically generated for GH workflows
           addPrComment(newComment);
-
-          console.log('added comment');
         } else {
           console.log('pr comment present or unwanted - skipping add');
         }
@@ -162,11 +135,9 @@ const buildTrelloLinkComment = async (cardId) => {
     } else {
       console.log(`no card url in pr comment. nothing to do`);
     }
-  
-    //if we wanted to make chainable.  move card to a new column in a subsequent action, for example?
-    //core.setOutput("trelloCardId", cardId);
   } catch (error) {
-    //failure will stop PR from being mergeable if we have that setting on the repo.  there is not currently a neutral exit in actions v2.
+    console.error(error);
+    //failure will stop PR from being mergeable if that setting enabled on the repo.  there is not currently a neutral exit in actions v2.
     core.setFailed(error.message);
   }
 })();
