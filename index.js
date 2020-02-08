@@ -113,7 +113,7 @@ const commentsContainsTrelloLink = async (cardId) => {
   console.log('got comments');
   console.dir(comments);
   
-  const linkRegex = new RegExp(`\[[^\]]+\]\(https:\/\/trello.com\/c\/${cardId}\/[^)]+\)`);
+  const linkRegex = new RegExp(`\\[[^\\]]+\\]\\(https:\\/\\/trello.com\\/c\\/${cardId}\\/[^)]+\\)`);
   
   console.log(`looking for ${linkRegex}`);
   
