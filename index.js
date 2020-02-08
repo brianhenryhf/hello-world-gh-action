@@ -129,7 +129,7 @@ const buildTrelloLinkComment = async (cardId) => {
 (async () => {
   try {
     
-    console.dir(github.context.payload);
+    console.dir(github.context.payload.issue.number);
   
     const cardId = extractTrelloCardId(github.context.payload.pull_request.body);
     const prUrl = github.context.payload.pull_request.html_url;
