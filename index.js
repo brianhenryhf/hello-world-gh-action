@@ -69,7 +69,7 @@ const getPrComments = async () => {
   return await octokit.issues.listComments(baseIssuesArgs);
 };
 
-const addPrComments = async (body) => {
+const addPrComment = async (body) => {
   return await octokit.issues.listComments({
       ...baseIssuesArgs,
       body
