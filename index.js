@@ -1,7 +1,6 @@
 const core = require('@actions/core');
 const github = require('@actions/github');
 const axios = require('axios');
-const util = require('util');
 
 //configured in workflow file, which in turn should use repo secrets settings
 const trelloKey = core.getInput('trello-key');
@@ -105,10 +104,8 @@ const commentsContainsTrelloLink = async (cardId) => {
 };
 
 const buildTrelloLinkComment = async (cardId) => {
-  const template = '![](https://github.trello.services/images/mini-trello-icon.png) [%s](%s)';
-  
   const cardInfo = await getCardInfoSubset(cardId);
-  return util.format(template, cardInfo.name, cardInfo.url);
+  return `![](https://github.trello.services/images/mini-trello-icon.png) [${cardInfo.name}](${cardInfo.url})'`;
 }
 
 
