@@ -7,7 +7,7 @@ const trelloKey = core.getInput('trello-key');
 const trelloToken = core.getInput('trello-token');
 //adds extra (redundant) PR comment, to mimic normal behavior of trello GH powerup
 const shouldAddPrComment = core.getInput('add-pr-comment') === 'true';
-
+const ghToken = core.getInput('repo-token');
 
 const trelloClient = axios.create({
   baseURL: 'https://api.trello.com',
@@ -66,7 +66,7 @@ const extractTrelloCardId = (prBody) =>   {
 
 const getPrComments = async () => {
   //token is not magically present in context
-  const octokit = new github.GitHub(github.token);
+  const octokit = new github.GitHub(ghToken);
   const evthookPayload = github.context.payload;
   
   
@@ -82,7 +82,7 @@ const getPrComments = async () => {
 };
 
 const addPrComment = async (body) => {
-  const octokit = new github.GitHub(github.token);
+  const octokit = new github.GitHub(ghToken);
   const evthookPayload = github.context.payload;
   
   return await octokit.issues.createComment({
