@@ -49,7 +49,7 @@ const createCardAttachment = async (cardId, attachUrl) => {
 };
 
 const getCardInfoSubset = async (cardId) => {
-  return requestTrello('post', `/1/cards/${cardId}`, null, {fields: 'name,url'});
+  return requestTrello('get', `/1/cards/${cardId}`, null, {fields: 'name,url'});
 };
 
 const extractTrelloCardId = (prBody) =>   {
@@ -71,7 +71,7 @@ const getPrComments = async () => {
   
   
 
-  console.dir(github.context);
+  //console.dir(github.context);
   
   
   return await octokit.issues.listComments({
@@ -106,9 +106,10 @@ const commentsContainsTrelloLink = async (cardId) => {
 const buildTrelloLinkComment = async (cardId) => {
   const template = '![](https://github.trello.services/images/mini-trello-icon.png) [%s](%s)';
   
-  const cardInfo = await getCardInfoSubset();
+  const cardInfo = await getCardInfoSubset(cardId);
   return util.format(template, cardInfo.name, cardInfo.url);
 }
+
 
 (async () => {
   try {
