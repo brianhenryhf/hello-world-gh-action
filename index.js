@@ -56,7 +56,6 @@ const getCardInfoSubset = async (cardId) => {
 };
 
 
-
 const octokit = new github.GitHub(ghToken);
 
 const baseIssuesArgs = {
@@ -75,11 +74,6 @@ const addPrComment = async (body) => {
       body
   });
 };
-console.log('addPrComment should be defined');
-
-
-
-
 
 
 const extractTrelloCardId = (prBody) =>   {
@@ -106,7 +100,6 @@ const buildTrelloLinkComment = async (cardId) => {
 }
 
 
-
 (async () => {
   try {
     const cardId = extractTrelloCardId(evthookPayload.pull_request.body);
@@ -128,9 +121,7 @@ const buildTrelloLinkComment = async (cardId) => {
           console.log('adding pr comment');
           const newComment = await buildTrelloLinkComment(cardId)
 
-          
-          console.log('about to add comment for reals')
-          //comments as 'github actions' bot, at least when using token automatically generated for GH workflows
+                    //comments as 'github actions' bot, at least when using token automatically generated for GH workflows
           await addPrComment(newComment);
         } else {
           console.log('pr comment present or unwanted - skipping add');
