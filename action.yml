@@ -11,6 +11,10 @@ inputs:
     description: 'should behave like Trello power-up and add (redundant) comment'
     required: false
     default: false
+  repo-token:
+    description: 'required if add-pr-comment is true'
+    required: false
+    default: ''
 runs:
   using: 'node12'
   main: 'index.js'
