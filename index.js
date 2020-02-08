@@ -1,6 +1,7 @@
 const core = require('@actions/core');
 const github = require('@actions/github');
 const axios = require('axios');
+const util = require('util');
 
 //configured in workflow file, which in turn should use repo secrets settings
 const trelloKey = core.getInput('trello-key');
