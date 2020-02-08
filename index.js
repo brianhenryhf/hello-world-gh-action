@@ -115,6 +115,8 @@ const commentsContainsTrelloLink = async (cardId) => {
   
   const linkRegex = new RegExp(`\[[^\]]+\]\(https:\/\/trello.com\/c\/${cardId}\/[^)]+\)`);
   
+  console.log(`looking for ${linkRegex}`);
+  
   return comments.data.some((comment) => linkRegex.test(comment.body));
 };
 
