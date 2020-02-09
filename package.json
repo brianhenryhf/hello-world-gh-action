@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "   XX   git+https://github.com/actions/hello-world-javascript-action.git  XX  "
+    "url": "git+https://github.com/brianhenryhf/gh-action-junk-project/blob/master/package.json"
   },
   "keywords": [],
   "author": "Brian Henry",
